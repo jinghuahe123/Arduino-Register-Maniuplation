@@ -159,3 +159,5 @@ TCCR1B = (1 << WGM12) | (1 << WGM13) |
 
 OCR1A = 512; // Set Duty Cycle to 50%
 ```
+
+Timer2 in Mode7 also supports variable TOP.
