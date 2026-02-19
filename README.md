@@ -18,6 +18,9 @@
 This configuration assumes FAST 8-bit Non-Inverting PWM mode. Timer 1 supports up to 16bit operation.
 
 **Timer 0 PWM Setup Example: (Pins 5 & 6)**
+
+Caution: Changing the prescaler on Timer0 is not reccomended as it can affect system clock functions such as delay() and millis(). 
+
 ```
 TCCR0A = (1<<WGM01) | (1<<WGM00) |  // Mode 3
          (1<<COM0A1) | // Enable Pin 6 (PD6) for PWM
