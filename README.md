@@ -70,9 +70,9 @@ TCCR2B = (1 << CS20);                                  // Prescaler = 1 (no pres
 OCR2A = 64; // 25% duty cycle
 ```
 
-### ATMEGA328P Timer1 Operations
+## ATMEGA328P Timer1 & Timer2 Variable PWM Frequencies
 
-Timer1 supports 16bit operation, with a variable TOP value. Unlike Timer0 and Timer2, whos TOP values are fixed at 255. 
+Timer1 and Timer2 support variable TOP values in certain PWM modes. Unlike Timer0, whos TOP values are fixed. 
 
 The frequency is calculated by:
 
@@ -97,6 +97,8 @@ The Resolution (bits) is given by:
 $$ Resolution = log_2(TOP+1)$$
 
 Such that $TOP+1$ is the number of steps available and the step size is given as $1/(TOP+1)$ as a fraction of the period. 
+
+### Timer1
 
 For this application, Mode 14 can be used to generate a high frequency PWM signal. The TOP value in this mode is set within the ICR1 register. 
 
@@ -163,4 +165,4 @@ TCCR1B = (1 << WGM12) | (1 << WGM13) |
 OCR1A = 512; // Set Duty Cycle to 50%
 ```
 
-Timer2 in Mode7 also supports variable TOP.
+### Timer 2
