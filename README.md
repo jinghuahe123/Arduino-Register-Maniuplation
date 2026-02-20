@@ -23,7 +23,7 @@ PORTC &= ~(1 << PC1); // Pulls A1 low (Pin1 on PORTC).
 PORTD &= ~(1 << PD2); // Pulls digital pin 2 low (Pin2 on PORTD).
 ```
 
-// more to add
+// more to add (analogread/digitalread)
 
 ## ATMEGA328P Basic PWM Configurations
 
