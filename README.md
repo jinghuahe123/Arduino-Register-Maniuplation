@@ -1,5 +1,7 @@
 # Arduino-Register-Maniuplation
 
+These are simplifed notes for my own use. Some configurations/manipulations have been left out for simplicity. 
+
 ## ATMEGA328P Digital Pin Manipulation
 
 The ATMEGA328P has three ports: PORTB, PORTC and PORTD. Each of the pins are mapped to a certain port.
