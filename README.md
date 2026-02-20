@@ -19,17 +19,16 @@ This configuration assumes FAST 8-bit Non-Inverting PWM mode. Timer 1 supports u
 
 **Timer 0 PWM Setup Example: (Pins 5 & 6)**
 
-Caution: Changing the prescaler on Timer0 is not reccomended as it can affect system clock functions such as delay() and millis(). 
-
 ```
 TCCR0A = (1<<WGM01) | (1<<WGM00) |  // Mode 3
          (1<<COM0A1) | // Enable Pin 6 (PD6) for PWM
          (1<<COM0B1);  // Enable Pin 5 (PD5) for PWM
 
+// Default is 64, this makes millis() go 64x faster!!
 TCCR0B = (1<<CS00); // Prescaler=1
 
 OCR0A = 0; // Controls Pin 6, sets to 0% duty cycle
-OCR0B = 128; // Controls Pin 6, sets to 50% duty cycle
+OCR0B = 128; // Controls Pin 5, sets to 50% duty cycle
 ```
 
 **Timer 1 PWM Setup Example: (Pins 9 & 10)**
@@ -70,9 +69,7 @@ TCCR2B = (1 << CS20);                                  // Prescaler = 1 (no pres
 OCR2A = 64; // 25% duty cycle
 ```
 
-## ATMEGA328P Timer1 & Timer2 Variable PWM Frequencies
-
-Timer1 and Timer2 support variable TOP values in certain PWM modes. Unlike Timer0, whos TOP values are fixed. 
+## ATMEGA328P Variable PWM Frequencies
 
 The frequency is calculated by:
 
@@ -82,8 +79,7 @@ F_{CPU} = 16Mhz (usually), the Arduino clock
 
 N = prescaler (1,8, 64, 256, 1024)
 
-TOP = a chosen value between 0 and 65535
-
+TOP = a chosen value between 0 and 65535 (For Timer0 and Timer2, this value is fixed at 255)
 
 | TOP Value | Frequency | Example (Prescaler=1)                           |
 | --------- | --------- | ----------------------------------------------- |
@@ -98,7 +94,87 @@ $$ Resolution = log_2(TOP+1)$$
 
 Such that $TOP+1$ is the number of steps available and the step size is given as $1/(TOP+1)$ as a fraction of the period. 
 
-### Timer1
+### Prescaler Options
+
+The Prescaler defines how much the system clock is defined by. It can be used on all three timers to adjust the PWM frequency. 
+
+Caution: Changing the prescaler on Timer0 is not reccomended as it can affect system clock functions such as delay() and millis(). 
+
+**Timer0 (8-bit) - TCCR0B [CS02, CS01, CS00]**
+
+| CS02 | CS01 | CS00 | Prescaler | Description            |
+| ---- | ---- | ---- | --------- | ---------------------- |
+| 0    | 0    | 0    | Stopped   | No clock (timer off)   |
+| 0    | 0    | 1    | 1         | No prescaling (16 MHz) |
+| 0    | 1    | 0    | 8         | Clock ÷ 8              |
+| 0    | 1    | 1    | 64        | Clock ÷ 64             |
+| 1    | 0    | 0    | 256       | Clock ÷ 256            |
+| 1    | 0    | 1    | 1024      | Clock ÷ 1024           |
+
+**Timer1 (16-bit) - TCCR1B [CS12, CS11, CS10]**
+
+| CS12 | CS11 | CS10 | Prescaler | Description            |
+| ---- | ---- | ---- | --------- | ---------------------- |
+| 0    | 0    | 0    | Stopped   | No clock (timer off)   |
+| 0    | 0    | 1    | 1         | No prescaling (16 MHz) |
+| 0    | 1    | 0    | 8         | Clock ÷ 8              |
+| 0    | 1    | 1    | 64        | Clock ÷ 64             |
+| 1    | 0    | 0    | 256       | Clock ÷ 256            |
+| 1    | 0    | 1    | 1024      | Clock ÷ 1024           |
+
+**Timer2 (8-bit) - TCCR2B [CS22, CS21, CS20]**
+
+| CS22 | CS21 | CS20 | Prescaler | Description            |
+| ---- | ---- | ---- | --------- | ---------------------- |
+| 0    | 0    | 0    | Stopped   | No clock (timer off)   |
+| 0    | 0    | 1    | 1         | No prescaling (16 MHz) |
+| 0    | 1    | 0    | 8         | Clock ÷ 8              |
+| 0    | 1    | 1    | 32        | Clock ÷ 32             |
+| 1    | 0    | 0    | 64        | Clock ÷ 64             |
+| 1    | 0    | 1    | 128       | Clock ÷ 128            |
+| 1    | 1    | 0    | 256       | Clock ÷ 256            |
+| 1    | 1    | 1    | 1024      | Clock ÷ 1024           |
+
+*Note: Timer2 can be clocked externally (e.g. by a 32.768kHz crystal for precise RTC operations). This is why it supports all eight prescaler combinations.*
+
+**Example Usage for Timer0 on Pin 5 (PD5) w/ Prescaler=256**
+
+```
+TCCR0A = (1<<WGM01) | (1<<WGM00) |  // Mode 3
+         (1<<COM0B1);  // Enable Pin 5 (PD5) for PWM
+
+TCCR0B = (1<<CS02); // Prescaler=256
+
+OCR0B = 128; // Controls Pin 5, sets to 50% duty cycle
+```
+
+**Example Usage for Timer1 on Pin 9 (PB1) w/ Prescaler=64**
+
+*TOP is not set in this example. Timer1 Emulates 8bit PWM.*
+
+```
+TCCR1A = (1<<WGM11) | (1<<WGM10) |  // Mode 5 (part 1)
+         (1<<COM1A1); // Enable Pin 9 (PB1) for PWM
+
+TCCR1B = (1 << WGM12) | // Mode 5 (part 2)
+         (1 << CS10) | (1 << CS11); // Prescaler=64
+
+OCR1A = 64; // Controls Pin 9, sets to 25% duty cycle
+```
+
+**Example Usage for Timer2 on Pin 3 (PD3) w/ Prescaler=128**
+```
+TCCR2A = (1 << WGM21) | (1 << WGM20) | // Mode 3
+           (1 << COM2B1);  // Enable Pin 3 (PD3) for PWM
+
+TCCR2B = (1 << CS22) | (1 << CS20); // Prescaler 128
+
+OCR2B = 128; // Controls Pin 3, sets to 50% duty cycle
+```
+
+### Timer1 Variable TOP
+
+Timer1 support variable TOP values in certain PWM modes. Unlike Timer0 and Timer1, whos TOP value cannot be changed without losing functionality of Pin 6 (PD6 / OCR0A) and Pin 11 (PB3 / OCR2A). This functionality is due to Timer1's support of the Input Capture Register (ICR1).
 
 For this application, Mode 14 can be used to generate a high frequency PWM signal. The TOP value in this mode is set within the ICR1 register. 
 
@@ -164,5 +240,3 @@ TCCR1B = (1 << WGM12) | (1 << WGM13) |
 
 OCR1A = 512; // Set Duty Cycle to 50%
 ```
-
-### Timer 2
