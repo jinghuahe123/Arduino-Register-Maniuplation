@@ -15,7 +15,7 @@ DDRC &= ~(1 << PC1); // Sets A1 as an input (Pin1 on PORTC).
 DDRD |= (1 << PD2); // Sets digital pin 2 as an output (Pin2 on PORTD).
 ```
 
-To set the state of a pin, set/clear the corresponding bit in the port data register. The default setting (0) is off.
+To set the state of a pin, set/clear the corresponding bit in the port data register. If the pin is set as an output in the previous section, this process sets the pin HIGH/LOW. If the pin is left as an input, this process enables/disables the internal pullup. The default state (0) is LOW/disabled. 
 
 ```
 PORTB |= (1 << PB4); // Pulls digital pin 12 high (Pin4 on PORTB).
