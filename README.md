@@ -2,7 +2,28 @@
 
 ## ATMEGA328P Digital Pin Manipulation
 
-// yet to add
+The ATMEGA328P has three ports: PORTB, PORTC and PORTD. Each of the pins are mapped to a certain port.
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/12c58c22-0436-4ac1-83c7-f8e1c8172ebc" />
+
+To set a pin as an output/input, set/clear the bit in the corresponding data direction register. The default pin setting (0) is an input. 
+
+```
+// e.g.
+DDRB |= (1 << PB4); // Sets digital pin 12 as an output (Pin4 on PORTB).
+DDRC &= ~(1 << PC1); // Sets A1 as an input (Pin1 on PORTC).
+DDRD |= (1 << PD2); // Sets digital pin 2 as an output (Pin2 on PORTD).
+```
+
+To set the state of a pin, set/clear the corresponding bit in the port data register. The default setting (0) is off.
+
+```
+PORTB |= (1 << PB4); // Pulls digital pin 12 high (Pin4 on PORTB).
+PORTC &= ~(1 << PC1); // Pulls A1 low (Pin1 on PORTC).
+PORTD &= ~(1 << PD2); // Pulls digital pin 2 low (Pin2 on PORTD).
+```
+
+// more to add
 
 ## ATMEGA328P Basic PWM Configurations
 
